@@ -128,29 +128,36 @@ router.delete('/:id', (req, res) => {
   });
 });
   
-  // router.put('/:id', (req, res) => {
-  //   const changes = req.body;
-  //   Hubs.update(req.params.id, changes)
-  //   .then(hub => {
-  //     if (hub) {
-  //       Hubs.findById(req.params.id)
-  //       .then(hub =>{
-  //         res.status(200).json(hub);
-  //       })
-  //       .catch(err =>{
-  //         res.status(500).json({errorMessage: "error reading the updated  "})
-  //       })
-  //     } else {
-  //       res.status(404).json({ message: 'The hub could not be found' });
-  //     }
-  //   })
-  //   .catch(error => {
-  //     // log error to database
-  //     console.log(error);
-  //     res.status(500).json({
-  //       message: 'Error updating the hub',
-  //     });
-  //   });
-  // });
+  router.put('/:id', (req, res) => {
+    
+    const changes = req.body;
+
+    if(!changes.text && !changes.contents){
+      res.status(400).json({errorMessage: "Please provide title and contents for the post."})
+    } else {
+      PostsDataBase.update(req.params.id, changes)
+      .then(hub => {
+        if (hub) {  
+          PostsDataBase.findById(req.params.id)
+          .then(hub =>{
+            res.status(200).json(hub);
+          })
+          .catch(err =>{
+            res.status(500).json({errorMessage: "error reading the updated  "})
+          })
+        } else {
+          res.status(404).json({ message: "The post with the specified ID does not exist." });
+        }
+      })
+      .catch(error => {
+        // log error to database
+        console.log(error);
+        res.status(500).json({
+          error: "The post information could not be modified."
+        });
+      });
+    }
+    
+  });
 
 module.exports = router;
